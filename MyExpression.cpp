@@ -40,7 +40,7 @@ public:
         //value
         variable_name = "";
     }
-    //~Expression();
+    ~Expression() = default;
 
     Expression operator+(const Expression& other) const {
         return Expression<T>(Type::Addition, *this, other);
@@ -121,7 +121,6 @@ public:
     }
 
 
-    // обработать все случаи в строках
     std::string to_string() {
 
         switch (type)
