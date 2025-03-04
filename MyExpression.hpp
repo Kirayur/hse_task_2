@@ -144,8 +144,8 @@ public:
     Expression ln() const {
         return Expression<T>(Type::Ln, *this);
     };  
-    Expression exp(const Expression& other) const {
-        return Expression<T>(Type::Exp, *this, other);
+    Expression exp() const {
+        return Expression<T>(Type::Exp, *this);
     };
 
     T calculate() {
