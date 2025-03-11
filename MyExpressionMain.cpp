@@ -8,7 +8,6 @@ int main() {
     Expression<int> c = Expression<int>(7);
     Expression<int> r = (a + c);
     std::unordered_map<std::string, int> map = std::unordered_map<std::string, int>();
-    //std::cout << r.calculate(map);
     std::cout << r.calculate();
     return 0;
 }
