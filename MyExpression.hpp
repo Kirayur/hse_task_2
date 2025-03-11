@@ -11,6 +11,7 @@
 #include <memory>
 
 
+
 template <typename T>
 class Expression {
 public:
@@ -36,7 +37,7 @@ public:
         variable_name = variable;   
     }
 
-    Expression(Type op, Expression<T> a, Expression<T> b = nullptr) {
+    Expression(Type op, Expression<T> a, Expression<T> b) {
         node_left = std::make_shared<Expression<T>>(a);
         node_right = std::make_shared<Expression<T>>(b);
         type = op;
@@ -49,7 +50,7 @@ public:
         node_right = nullptr; 
         type = op;
         variable_name = "";
-    }   
+    }
 
     T NodeCopy() {
 
