@@ -94,5 +94,20 @@ int main() {
     my_ln();
     my_exp();
     std::cout << "All tests passed!" << std::endl;
+
+    try {
+        auto expr = Expression<double>::parse("3 ^ 4");
+        std::unordered_map<std::string, double> vars;
+        double result = expr.calculate(vars);
+        std::cout << "Result: " << result << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error" << std::endl;
+    }
+
+    auto expr = Expression<double>::parse("x^y");
+    auto derivative = expr.differentiate("y");
+    std::cout << "Выражение: " << expr.to_string() << std::endl;
+    std::cout << "Производная: " << derivative.to_string() << std::endl;
+
     return 0;
 }
