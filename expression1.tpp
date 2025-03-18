@@ -166,7 +166,11 @@ T Expression<T>::calculate(std::unordered_map<std::string, T>& variables) {
             return node_left->calculate(variables) * node_right->calculate(variables);
 
         case Type::Division:
-            return node_left->calculate(variables) / node_right->calculate(variables);
+            T denominator = node_right->calculate(variables);
+            if (denominator == 0) {
+                throw std::runtime_error("Division by zero");
+            }
+            return node_left->calculate(variables) / denominator;
 
         case Type::Exponentiation:
             return std::pow(node_left->calculate(variables), node_right->calculate(variables));
@@ -178,7 +182,11 @@ T Expression<T>::calculate(std::unordered_map<std::string, T>& variables) {
             return std::cos(node_left->calculate(variables));
 
         case Type::Ln:
-            return std::log(node_left->calculate(variables));
+            T arg = node_left->calculate(variables);
+            if (arg <= 0) {
+                throw std::runtime_error("Logarithm of non-positive number");
+            }
+            return std::log(arg);
 
         case Type::Exp:
             return std::exp(node_left->calculate(variables));
@@ -437,7 +445,7 @@ Expression<T> Expression<T>::parseFunctionOrVariable(const std::string& expr, si
             throw std::runtime_error("Expected '(' after 'ln'");
         }
         pos++;
-        Expression<T> arg = parseExpression(expr, pos);
+        Expression<T> arg = parseExpression(expr, pos); 
         skipWhitespace(expr, pos);
         if (expr[pos] != ')') {
             throw std::runtime_error("Expected ')' after ln argument");
