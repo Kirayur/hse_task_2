@@ -166,7 +166,7 @@ T Expression<T>::calculate(std::unordered_map<std::string, T>& variables) {
             return node_left->calculate(variables) * node_right->calculate(variables);
 
         case Type::Division:
-            if (node_right->calculate(variables) == 0) {
+            if (node_right->calculate(variables) == T(0)) {
                 throw std::runtime_error("Division by zero");
             }
             return node_left->calculate(variables) / node_right->calculate(variables);
@@ -181,10 +181,20 @@ T Expression<T>::calculate(std::unordered_map<std::string, T>& variables) {
             return std::cos(node_left->calculate(variables));
 
         case Type::Ln:
-            if (node_left->calculate(variables) <= 0) {
-                throw std::runtime_error("Logarithm of non-positive number");
+            if constexpr (std::is_same_v<T, std::complex<double>>) {
+                if (std::norm(node_left->calculate(variables)) == 0) {
+                    throw std::runtime_error("Logarithm of zero");
+                }
+            } else {
+                if (node_left->calculate(variables) <= 0) {
+                    throw std::runtime_error("Logarithm of non-positive number");
+                }
             }
             return std::log(node_left->calculate(variables));
+            /*if (node_left->calculate(variables) <= 0) {
+                throw std::runtime_error("Logarithm of non-positive number");
+            }
+            return std::log(node_left->calculate(variables));*/
 
         case Type::Exp:
             return std::exp(node_left->calculate(variables));
@@ -198,7 +208,16 @@ template <typename T>
 std::string Expression<T>::to_string() {
     switch (type) {
         case Type::Number:
-            return std::to_string(value);
+            if constexpr (std::is_same_v<T, std::complex<double>>) {
+                std::ostringstream oss;
+                oss << value.real();
+                if (value.imag() != 0) {
+                    oss << (value.imag() > 0 ? "+" : "") << value.imag() << "i";
+                }
+                return oss.str();
+            } else {
+                return std::to_string(value);
+            }
 
         case Type::Variable:
             return variable_name;
@@ -239,7 +258,7 @@ template <typename T>
 Expression<T> Expression<T>::differentiate(const std::string& var_name) const {
     switch (type) {
         case Type::Number:
-            return Expression<T>(0);
+            return Expression<T>(T(0));
 
         case Type::Variable:
             return Expression<T>(variable_name == var_name ? 1 : 0);
@@ -368,7 +387,7 @@ Expression<T> Expression<T>::parseFactor(const std::string& expr, size_t& pos) {
 
     if (expr[pos] == '-') {
         pos++;
-        return Expression<T>(Type::Subtraction, Expression<T>(0), parseFactor(expr, pos));
+        return Expression<T>(Type::Subtraction, Expression<T>(T(0)), parseFactor(expr, pos));
     }
 
     throw std::runtime_error("Unexpected character: " + std::string(1, expr[pos]));
